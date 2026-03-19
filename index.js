@@ -4,6 +4,12 @@ let todos =[];
 let todoDataList = document.getElementById('todo-data-list')
 let saveButton = document.getElementById('save-todo')
 let todoInputBar = document.getElementById('todo-input-bar')
+let getTodoButton = document.getElementById('get-todo');
+
+getTodoButton.addEventListener('click', () => {
+    todos = todos.filter((todo) => todo.status !== "Finished");
+    reRenderTodo();
+})
 
 todoInputBar.addEventListener('keyup', function toggleSaveButton() {
     let todotext = todoInputBar.value;
@@ -74,6 +80,32 @@ function finishTodo(event){
 }
 
 
+function editTodo(event){
+    let editButtonPress = event.target
+    let indexTobeEdit = Number(editButtonPress.getAttribute('todo-idx'));
+    let detailDiv = document.querySelector(`div[todo-idx="${indexTobeEdit}"]`);
+    let input = document.querySelector(`input[todo-idx="${indexTobeEdit}"]`);
+    detailDiv.style.display ="none";
+    input.type = 'text';
+    input.value = detailDiv.textContent;
+
+}
+function saveEditTodo(event){
+    let input = event.target
+    let indexTobeEdit = Number(input.getAttribute("todo-idx"))
+    let detailDiv = document.querySelector(`div[todo-idx="${indexTobeEdit}"]`);
+    if(event.keyCode == 13){
+        detailDiv.textContent= input.value;
+        detailDiv.style.display= 'block';
+        input.value = ''
+        input.type = 'hidden'
+
+    }
+
+
+}
+
+
 
 
 function addTodo(todo,todoCount){
@@ -86,6 +118,9 @@ function addTodo(todo,todoCount){
     let todoAction = document.createElement("div");
     let deleteButton = document.createElement("button");
     let finshButton = document.createElement("button");
+    let editButton = document.createElement("button");
+    let hiddenInput = document.createElement('input');
+
     let hr = document.createElement("hr")
 
     todonumber.textContent = `${todoCount}.`;
@@ -93,15 +128,21 @@ function addTodo(todo,todoCount){
     todoStatus.textContent = todo.status;
     deleteButton.textContent = "Delete";
     finshButton.textContent = todo.finishButtonText;
+    editButton.textContent = "Edit";
+
     
 
     todoitem.appendChild(todonumber);
     todoitem.appendChild(todoDetils);
+    todoitem.appendChild(hiddenInput);
     todoitem.appendChild(todoStatus);
     todoitem.appendChild(todoAction);
 
+
     todoAction.appendChild(deleteButton);
     todoAction.appendChild(finshButton);
+    todoAction.appendChild(editButton);
+
 
     rowdiv.appendChild(todoitem);
     rowdiv.appendChild(hr);
@@ -119,12 +160,24 @@ function addTodo(todo,todoCount){
     todoAction.classList.add('todo-action','d-flex','justify-content-start','gap-2');
     deleteButton.classList.add('btn', 'btn-danger','delete-todo');
     finshButton.classList.add('btn', 'btn-success','finish-todo');
+    editButton.classList.add('btn', 'btn-warning','edit-todo');
+    hiddenInput.classList.add('form-control','todo-detail')
 
-
+    // adding attribute----
+    
     finshButton.setAttribute('todo-idx',todoCount-1);
     deleteButton.setAttribute('todo-idx',todoCount-1);
+    editButton.setAttribute('todo-idx', todoCount-1);
+    todoDetils.setAttribute('todo-idx',todoCount-1);
+    hiddenInput.setAttribute('todo-idx',todoCount-1);
+    hiddenInput.addEventListener('keypress',saveEditTodo);
+
     deleteButton.onclick = removeTodo;
     finshButton.onclick =  finishTodo;
+    editButton.onclick =  editTodo;
+    hiddenInput.type = "hidden";
+
+
 
 
 
